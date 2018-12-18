@@ -61,7 +61,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
-
+writer = tf.summary.FileWriter('./logs', sess.graph)
 for epoch in range(training_epochs):  # epoch 만큼 수행
     avg_cost = 0
 
