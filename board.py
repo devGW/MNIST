@@ -63,7 +63,7 @@ def train():
             tf.summary.scalar('min', tf.reduce_min(var))
             tf.summary.histogram('histogram', var)
 
-    def nn_layer(input_tensor, input_dim, output_dim, layer_name, act=tf.nn.relu):
+    def nn_layer(input_tensor, input_dim, output_dim, layer_name, act=tf.nn.sigmoid):
         """간단한 neural net layer를 만들기 위해 재사용(resuable)이 가능한 코드
         행렬 곱셈(matrix multiply), 바이어스 덧셈(bias add) 이후에 nonlinearize를 위해 ReLU를 사용한다.
         또한, 그래프를 읽기 쉽게 만들기 위해 name scoping을 지정하고 summary ops들을 추가한다.
@@ -84,7 +84,7 @@ def train():
             tf.summary.histogram('activations', activations)
             return activations
 
-    hidden1 = nn_layer(x, 784, 200, 'layer1')
+    hidden1 = nn_layer(x, 784, 700, 'layer1')
 
     with tf.name_scope('dropout'):
         keep_prob = tf.placeholder(tf.float32)
@@ -97,7 +97,7 @@ def train():
     #     tf.summary.scalar('dropout_keep_probability', keep_prob)
     #     dropped = tf.nn.dropout(hidden2, keep_prob)
 
-    y = nn_layer(dropped, 200, 10, 'layer2', act=tf.identity)
+    y = nn_layer(dropped, 700, 10, 'layer2', act=tf.identity)
 
     with tf.name_scope('cross_entropy'):
         diff = tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y)
@@ -120,7 +120,7 @@ def train():
     # 모든 요약정보들(summaries)을 합치고(merge) 그들을 지정된 경로에 쓴다.(write) (기본경로: /tmp/tensorflow/mnist/logs/mnist_with_summaries)
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./train', sess.graph)
-    test_writer = tf.summary.FileWriter('./rate0.1&node200')
+    test_writer = tf.summary.FileWriter('./test')
     tf.global_variables_initializer().run()
 
     # 모델을 학습시키고, 요약정보들(summaries)들을 쓴다.
@@ -177,9 +177,9 @@ if __name__ == '__main__':
                         help='If true, uses fake data for unit testing.')
     parser.add_argument('--max_steps', type=int, default=500,
                         help='Number of steps to run trainer.')
-    parser.add_argument('--learning_rate', type=float, default=0.1,
+    parser.add_argument('--learning_rate', type=float, default=0.01,
                         help='Initial learning rate')
-    parser.add_argument('--dropout', type=float, default=0.7,
+    parser.add_argument('--dropout', type=float, default=1,
                         help='Keep probability for training dropout.')
     parser.add_argument('--data_dir', type=str, default='/tmp/tensorflow/mnist/input_data',
                         help='Directory for storing input data')
