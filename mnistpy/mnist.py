@@ -2,11 +2,12 @@ import tensorflow as tf
 import random
 from tensorflow.examples.tutorials.mnist import input_data
 
+
 tf.set_random_seed(777)
 
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-learning_rate = 0.001
-training_epochs = 15
+learning_rate = 0.002
+training_epochs = 5
 batch_size = 100
 total_batch = int(mnist.train.num_examples / batch_size)
 
@@ -61,7 +62,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
-writer = tf.summary.FileWriter('./logs', sess.graph)
+
 for epoch in range(training_epochs):  # epoch 만큼 수행
     avg_cost = 0
 
@@ -72,6 +73,7 @@ for epoch in range(training_epochs):  # epoch 만큼 수행
         avg_cost += c / total_batch
 
     print('Epoch:', '%04d' % (epoch + 1), 'cost =', '{:.9f}'.format(avg_cost))
+
 
 print('Learning Finished!')
 
@@ -85,6 +87,15 @@ r = random.randint(0, mnist.test.num_examples - 1)
 print("Label: ", sess.run(tf.argmax(mnist.test.labels[r:r + 1], 1)))
 print("Prediction: ", sess.run(
     tf.argmax(hypothesis, 1), feed_dict={X: mnist.test.images[r:r + 1], keep_prob: 1}))
+
+tf.summary.scalar('cost', cost)
+tf.summary.scalar('accuracy', accuracy)
+summary = tf.summary.merge_all()
+writer = tf.summary.FileWriter('./logs')
+writer.add_graph(sess.graph)
+
+s, _ = sess.run([summary, optimizer], feed_dict={
+                X: mnist.test.images, Y: mnist.test.labels, keep_prob: 1})
 
 
 # https://github.com/hunkim/DeepLearningZeroToAll 참조
